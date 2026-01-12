@@ -6,9 +6,6 @@ from tinytorch.tensor import Tensor
 
 
 def test_unit_tensor_creation():
-    """🧪 Test Tensor creation with various data types."""
-    print("🧪 Unit Test: Tensor Creation...")
-
     # Test scalar creation
     scalar = Tensor(5.0)
     assert scalar.data == 5.0
@@ -33,13 +30,8 @@ def test_unit_tensor_creation():
     assert tensor_3d.shape == (2, 2, 2)
     assert tensor_3d.size == 8
 
-    print("✅ Tensor creation works correctly!")
-
 
 def test_unit_arithmetic_operations():
-    """🧪 Test arithmetic operations with broadcasting."""
-    print("🧪 Unit Test: Arithmetic Operations...")
-
     # Test tensor + tensor
     a = Tensor([1, 2, 3])
     b = Tensor([4, 5, 6])
@@ -74,13 +66,8 @@ def test_unit_arithmetic_operations():
     expected = np.array([-0.5, 0.0, 0.5], dtype=np.float32)
     assert np.allclose(normalized.data, expected)
 
-    print("✅ Arithmetic operations work correctly!")
-
 
 def test_unit_matrix_multiplication():
-    """🧪 Test matrix multiplication operations."""
-    print("🧪 Unit Test: Matrix Multiplication...")
-
     # Test 2×2 matrix multiplication (basic case)
     a = Tensor([[1, 2], [3, 4]])  # 2×2
     b = Tensor([[5, 6], [7, 8]])  # 2×2
@@ -115,13 +102,8 @@ def test_unit_matrix_multiplication():
         assert "Inner dimensions must match" in str(e)
         assert "2 ≠ 3" in str(e)  # Should show specific dimensions
 
-    print("✅ Matrix multiplication works correctly!")
-
 
 def test_unit_shape_manipulation():
-    """🧪 Test reshape and transpose operations."""
-    print("🧪 Unit Test: Shape Manipulation...")
-
     # Test basic reshape (flatten → matrix)
     tensor = Tensor([1, 2, 3, 4, 5, 6])  # Shape: (6,)
     reshaped = tensor.reshape(2, 3)  # Shape: (2, 3)
@@ -169,13 +151,8 @@ def test_unit_shape_manipulation():
     flattened = batch_images.reshape(2, -1)  # (batch=2, features=12)
     assert flattened.shape == (2, 12)
 
-    print("✅ Shape manipulation works correctly!")
-
 
 def test_unit_reduction_operations():
-    """🧪 Test reduction operations."""
-    print("🧪 Unit Test: Reduction Operations...")
-
     matrix = Tensor([[1, 2, 3], [4, 5, 6]])  # Shape: (2, 3)
 
     # Test sum all elements (common for loss computation)
@@ -226,13 +203,8 @@ def test_unit_reduction_operations():
     spatial_mean = tensor_3d.mean(axis=(1, 2))  # Average across spatial dimensions
     assert spatial_mean.shape == (2,)  # One value per batch item
 
-    print("✅ Reduction operations work correctly!")
-
 
 def test_integration_neural_network():
-    """🧪 Integration Test: Two-Layer Neural Network."""
-    print("🧪 Integration Test: Two-Layer Neural Network...")
-
     # Create input data (2 samples, 3 features)
     x = Tensor([[1, 2, 3], [4, 5, 6]])
 
@@ -256,12 +228,8 @@ def test_integration_neural_network():
     assert not np.isnan(output.data).any(), "Output contains NaN values"
     assert np.isfinite(output.data).all(), "Output contains infinite values"
 
-    print("✅ Two-layer neural network computation works!")
-
 
 def test_integration_shape_operations():
-    """🧪 Integration Test: Complex Shape Operations."""
-    print("🧪 Integration Test: Complex Shape Operations...")
     data = Tensor([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12])
 
     # Reshape to 3D tensor (simulating batch processing)
@@ -280,13 +248,8 @@ def test_integration_shape_operations():
     transposed = tensor_3d.transpose()  # Should transpose last two dims
     assert transposed.shape == (2, 3, 2)
 
-    print("✅ Complex shape operations work!")
-
 
 def test_integration_broadcasting():
-    """🧪 Integration Test: Broadcasting Edge Cases."""
-    print("🧪 Integration Test: Broadcasting Edge Cases...")
-
     # Scalar broadcasting
     scalar = Tensor(5.0)
     vector = Tensor([1, 2, 3])
@@ -301,22 +264,8 @@ def test_integration_broadcasting():
     expected = np.array([[11, 22], [13, 24]], dtype=np.float32)
     assert np.array_equal(result.data, expected)
 
-    print("✅ Broadcasting edge cases work!")
 
-
-def test_module():
-    """🧪 Module Test: Complete Integration
-
-    Comprehensive test of entire module functionality.
-
-    This final test runs before module summary to ensure:
-    - All unit tests pass
-    - Functions work together correctly
-    - Module is ready for integration with TinyTorch
-    """
-    print("🧪 RUNNING MODULE INTEGRATION TEST")
-    print("=" * 50)
-
+def test_tensor():
     # Run all unit tests
     print("Running unit tests...")
     test_unit_tensor_creation()
@@ -330,11 +279,7 @@ def test_module():
     test_integration_shape_operations()
     test_integration_broadcasting()
 
-    print("\n" + "=" * 50)
-    print("🎉 ALL TESTS PASSED! Module ready for export.")
-    print("Run: tito module complete 01_tensor")
 
-
-# Run comprehensive module test
+# Run comprehensive tensor module test
 if __name__ == "__main__":
-    test_module()
+    test_tensor()
