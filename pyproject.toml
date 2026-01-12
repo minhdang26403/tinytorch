@@ -19,7 +19,7 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["tensor*", "activations*", "optimizers*"]
+include = ["tensor*", "activations*", "optimizers*", "layers*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

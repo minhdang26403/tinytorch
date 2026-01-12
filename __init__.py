@@ -1,4 +1,5 @@
 import activations
+import layers
 import tensor
 
-__all__ = ["tensor", "activations"]
+__all__ = ["activations", "layers", "tensor"]
