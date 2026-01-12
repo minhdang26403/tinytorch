@@ -1,7 +1,3 @@
-# | default_exp core.layers
-# | export
-
-
 import numpy as np
 
 from tensor import Tensor
@@ -15,7 +11,6 @@ DROPOUT_MIN_PROB = 0.0  # Minimum dropout probability (no dropout)
 DROPOUT_MAX_PROB = 1.0  # Maximum dropout probability (drop everything)
 
 
-# | export
 class Layer:
     """
     Base class for all neural network layers.
