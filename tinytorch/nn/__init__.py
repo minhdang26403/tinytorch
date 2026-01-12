@@ -2,7 +2,7 @@
 
 from .activation import GELU, ReLU, Sigmoid, Softmax, Tanh
 from .dropout import Dropout
-from .loss import BinaryCrossEntropyLoss, CrossEntropyLoss, MSELoss
+from .loss import BinaryCrossEntropyLoss, CrossEntropyLoss, MSELoss, log_softmax
 from .module import Linear, Module, Sequential
 
 __all__ = [
@@ -18,6 +18,7 @@ __all__ = [
     "Sigmoid",
     "Softmax",
     "Tanh",
+    "log_softmax",
 ]
 
 assert __all__ == sorted(__all__)
