@@ -10,9 +10,6 @@ TOLERANCE = 1e-10  # Small tolerance for floating-point comparisons in tests
 
 
 def test_unit_sigmoid():
-    """🔬 Test Sigmoid implementation."""
-    print("🔬 Unit Test: Sigmoid...")
-
     sigmoid = Sigmoid()
 
     # Test basic cases
@@ -39,13 +36,8 @@ def test_unit_sigmoid():
         "sigmoid(+∞) should approach 1"
     )
 
-    print("✅ Sigmoid works correctly!")
-
 
 def test_unit_relu():
-    """🔬 Test ReLU implementation."""
-    print("🔬 Unit Test: ReLU...")
-
     relu = ReLU()
 
     # Test mixed positive/negative values
@@ -74,13 +66,8 @@ def test_unit_relu():
     zeros = np.sum(result.data == 0)
     assert zeros == 3, f"ReLU should create sparsity, got {zeros} zeros out of 4"
 
-    print("✅ ReLU works correctly!")
-
 
 def test_unit_tanh():
-    """🔬 Test Tanh implementation."""
-    print("🔬 Unit Test: Tanh...")
-
     tanh = Tanh()
 
     # Test zero
@@ -112,13 +99,8 @@ def test_unit_tanh():
     )
     assert np.allclose(result.data[1], 1, atol=TOLERANCE), "tanh(+∞) should approach 1"
 
-    print("✅ Tanh works correctly!")
-
 
 def test_unit_gelu():
-    """🔬 Test GELU implementation."""
-    print("🔬 Unit Test: GELU...")
-
     gelu = GELU()
 
     # Test zero (should be approximately 0)
@@ -148,13 +130,8 @@ def test_unit_gelu():
     diff2 = abs(result.data[2] - result.data[1])
     assert diff1 < 0.01 and diff2 < 0.01, "GELU should be smooth around zero"
 
-    print("✅ GELU works correctly!")
-
 
 def test_unit_softmax():
-    """🔬 Test Softmax implementation."""
-    print("🔬 Unit Test: Softmax...")
-
     softmax = Softmax()
 
     # Test basic probability properties
@@ -194,12 +171,8 @@ def test_unit_softmax():
     row_sums = np.sum(result.data, axis=-1)
     assert np.allclose(row_sums, [1.0, 1.0]), "Each row should sum to 1"
 
-    print("✅ Softmax works correctly!")
-
 
 def test_integration_tensor_properties():
-    """🔬 Integration Test: Tensor property preservation."""
-    print("🔬 Integration Test: Tensor property preservation...")
     test_data = Tensor([[1, -1], [2, -2]])  # 2D tensor
 
     activations = [Sigmoid(), ReLU(), Tanh(), GELU()]
@@ -212,12 +185,8 @@ def test_integration_tensor_properties():
             f"Output not Tensor from {activation.__class__.__name__}"
         )
 
-    print("✅ All activations preserve tensor properties!")
-
 
 def test_integration_softmax_dimensions():
-    """🔬 Integration Test: Softmax dimension handling."""
-    print("🔬 Integration Test: Softmax dimension handling...")
     data_3d = Tensor([[[1, 2, 3], [4, 5, 6]], [[7, 8, 9], [10, 11, 12]]])  # (2, 2, 3)
     softmax = Softmax()
 
@@ -229,13 +198,8 @@ def test_integration_softmax_dimensions():
     last_dim_sums = np.sum(result_last.data, axis=-1)
     assert np.allclose(last_dim_sums, 1.0), "Last dimension should sum to 1"
 
-    print("✅ Softmax handles different dimensions correctly!")
-
 
 def test_integration_activation_chaining():
-    """🔬 Integration Test: Activation chaining."""
-    print("🔬 Integration Test: Activation chaining...")
-
     # Simulate: Input → Linear → ReLU → Linear → Softmax (like a simple network)
     x = Tensor([[-1, 0, 1, 2]])  # Batch of 1, 4 features
 
@@ -253,22 +217,8 @@ def test_integration_activation_chaining():
         "Final output should be probability distribution"
     )
 
-    print("✅ Activation chaining works correctly!")
 
-
-def test_module():
-    """🧪 Module Test: Complete Integration
-
-    Comprehensive test of entire module functionality.
-
-    This final test runs before module summary to ensure:
-    - All unit tests pass
-    - Functions work together correctly
-    - Module is ready for integration with TinyTorch
-    """
-    print("🧪 RUNNING MODULE INTEGRATION TEST")
-    print("=" * 50)
-
+def test_activation():
     # Run all unit tests
     print("Running unit tests...")
     test_unit_sigmoid()
@@ -282,11 +232,7 @@ def test_module():
     test_integration_softmax_dimensions()
     test_integration_activation_chaining()
 
-    print("\n" + "=" * 50)
-    print("🎉 ALL TESTS PASSED! Module ready for export.")
-    print("Run: tito module complete 02")
-
 
 # Run comprehensive module test
 if __name__ == "__main__":
-    test_module()
+    test_activation()

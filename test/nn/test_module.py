@@ -7,9 +7,6 @@ XAVIER_SCALE_FACTOR = 1.0  # Xavier/Glorot initialization uses sqrt(1/fan_in)
 
 
 def test_unit_linear_layer():
-    """🔬 Test Linear layer implementation."""
-    print("🔬 Unit Test: Linear Layer...")
-
     # Test layer creation
     layer = Linear(784, 256)
     assert layer.in_features == 784
@@ -48,9 +45,6 @@ def test_unit_linear_layer():
 
 
 def test_edge_cases_linear():
-    """🔬 Test Linear layer edge cases."""
-    print("🔬 Edge Case Tests: Linear Layer...")
-
     layer = Linear(10, 5)
 
     # Test single sample (should handle 2D input)
@@ -77,13 +71,8 @@ def test_edge_cases_linear():
     y = layer_no_bias.forward(x)
     assert y.shape == (4, 5), "Should work without bias"
 
-    print("✅ Edge cases handled correctly!")
-
 
 def test_parameter_collection_linear():
-    """🔬 Test Linear layer parameter collection."""
-    print("🔬 Parameter Collection Test: Linear Layer...")
-
     layer = Linear(10, 5)
 
     # Verify parameter collection works
@@ -97,13 +86,8 @@ def test_parameter_collection_linear():
     params_no_bias = layer_no_bias.parameters()
     assert len(params_no_bias) == 1, "Should return 1 parameter (weight only)"
 
-    print("✅ Parameter collection works correctly!")
-
 
 def test_unit_dropout_layer():
-    """🔬 Test Dropout layer implementation."""
-    print("🔬 Unit Test: Dropout Layer...")
-
     # Test dropout creation
     dropout = Dropout(0.5)
     assert dropout.p == 0.5
@@ -168,12 +152,9 @@ def test_unit_dropout_layer():
     except ValueError:
         pass
 
-    print("✅ Dropout layer works correctly!")
-
 
 def analyze_layer_memory():
-    """📊 Analyze memory usage patterns in layer operations."""
-    print("📊 Analyzing Layer Memory Usage...")
+    """Analyze memory usage patterns in layer operations."""
 
     # Test different layer sizes
     layer_configs = [
@@ -197,7 +178,7 @@ def analyze_layer_memory():
         )
 
     # Analyze multi-layer memory scaling
-    print("\n💡 Multi-layer Model Memory Scaling:")
+    print("\nMulti-layer Model Memory Scaling:")
     hidden_sizes = [128, 256, 512, 1024, 2048]
 
     for hidden_size in hidden_sizes:
@@ -215,10 +196,8 @@ def analyze_layer_memory():
 
 
 def analyze_layer_performance():
-    """📊 Analyze computational complexity of layer operations."""
+    """Analyze computational complexity of layer operations."""
     import time
-
-    print("📊 Analyzing Layer Computational Complexity...")
 
     # Test forward pass FLOPs
     batch_sizes = [1, 32, 128, 512]
