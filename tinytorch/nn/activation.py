@@ -1,6 +1,6 @@
 import numpy as np
 
-from tensor import Tensor
+from ..tensor import Tensor
 
 
 class Sigmoid:
@@ -68,7 +68,7 @@ class ReLU:
         """Allows the activation to be called like a function."""
         return self.forward(x)
 
-    def backward(self, x: Tensor) -> None:
+    def backward(self, grad: Tensor) -> None:
         """Compute gradient."""
         pass
 
@@ -93,7 +93,7 @@ class Tanh:
         """Allows the activation to be called like a function."""
         return self.forward(x)
 
-    def backward(self, x: Tensor) -> None:
+    def backward(self, grad: Tensor) -> None:
         """Compute gradient."""
         pass
 
@@ -133,19 +133,19 @@ class Softmax:
         """Return empty list (activations have no learnable parameters)."""
         return []
 
-    def forward(self, x: Tensor, axis: int = -1) -> Tensor:
+    def forward(self, x: Tensor, dim: int = -1) -> Tensor:
         """
         Apply softmax activation along specified dimension.
         """
         # Numerical stability: subtract max to prevent overflow
-        x_max = np.max(x.data, axis=axis, keepdims=True)
+        x_max = np.max(x.data, axis=dim, keepdims=True)
         x_shifted = x.data - x_max  # Tensor subtraction
 
         # Compute exponentials
         exp_values = np.exp(x_shifted)
 
         # Sum along dimension
-        exp_sum = np.sum(exp_values, axis=axis, keepdims=True)
+        exp_sum = np.sum(exp_values, axis=dim, keepdims=True)
 
         # Normalize to get probabilities
         result = exp_values / exp_sum
@@ -154,5 +154,5 @@ class Softmax:
     def __call__(self, x: Tensor) -> Tensor:
         return self.forward(x)
 
-    def backward(self, x: Tensor) -> None:
+    def backward(self, grad: Tensor) -> None:
         pass

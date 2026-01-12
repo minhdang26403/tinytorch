@@ -83,6 +83,20 @@ class Tensor:
                 f"Expected Tensor for matrix multiplication, got {type(other)}"
             )
 
+        # Validate inner dimensions before dispatching to NumPy so we can
+        # provide a clearer error message (helpful in tests and debugging).
+        self_inner = self.data.shape[-1]
+        # For vectors, the relevant dimension is the only axis (index 0); for
+        # matrices/higher rank tensors, it's the second-to-last axis.
+        other_inner = (
+            other.data.shape[-2] if other.data.ndim > 1 else other.data.shape[0]
+        )
+
+        if self_inner != other_inner:
+            raise ValueError(
+                f"Inner dimensions must match for matmul: {self_inner} ≠ {other_inner}"
+            )
+
         return Tensor(self.data @ other.data)
 
     def __matmul__(self, other):
@@ -94,15 +108,38 @@ class Tensor:
         return Tensor(self.data[key])
 
     def reshape(self, *shape):
-        """Reshape tensor to new dimensions."""
-        # If the user passed a single tuple, e.g., reshape((1, 2, 3))
-        # 'shape' will be ((1, 2, 3),)
+        """Reshape tensor to new dimensions with basic validation."""
         if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
-            new_shape = shape[0]
+            shape = tuple(shape[0])
         else:
-            new_shape = shape
+            shape = tuple(shape)
 
-        return Tensor(self.data.reshape(new_shape))
+        # Handle a single inferred dimension (-1) manually for clearer errors.
+        if shape.count(-1) > 1:
+            raise ValueError("Only one dimension can be inferred with -1")
+
+        if -1 in shape:
+            known = 1
+            for dim in shape:
+                if dim != -1:
+                    known *= dim
+            if self.size % known != 0:
+                raise ValueError(
+                    f"Total elements must match for reshape: {self.size} ≠ {known}"
+                )
+            inferred = self.size // known
+            computed_shape = tuple(inferred if dim == -1 else dim for dim in shape)
+        else:
+            requested = 1
+            for dim in shape:
+                requested *= dim
+            if requested != self.size:
+                raise ValueError(
+                    f"Total elements must match for reshape: {self.size} ≠ {requested}"
+                )
+            computed_shape = shape
+
+        return Tensor(self.data.reshape(computed_shape))
 
     def transpose(self, dim0=None, dim1=None):
         """Transpose tensor dimensions."""

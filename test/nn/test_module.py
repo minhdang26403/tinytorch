@@ -1,8 +1,7 @@
 import numpy as np
 
-from activations import ReLU
-from layers import Dropout, Linear
-from tensor import Tensor
+from tinytorch.nn import Dropout, Linear, ReLU
+from tinytorch.tensor import Tensor
 
 XAVIER_SCALE_FACTOR = 1.0  # Xavier/Glorot initialization uses sqrt(1/fan_in)
 

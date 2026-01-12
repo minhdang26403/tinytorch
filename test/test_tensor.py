@@ -2,7 +2,7 @@
 
 import numpy as np
 
-from tensor import Tensor
+from tinytorch.tensor import Tensor
 
 
 def test_unit_tensor_creation():

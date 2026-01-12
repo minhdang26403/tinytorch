@@ -2,8 +2,8 @@
 
 import numpy as np
 
-from activations import GELU, ReLU, Sigmoid, Softmax, Tanh
-from tensor import Tensor
+from tinytorch.nn import GELU, ReLU, Sigmoid, Softmax, Tanh
+from tinytorch.tensor import Tensor
 
 # Constants for numerical comparisons
 TOLERANCE = 1e-10  # Small tolerance for floating-point comparisons in tests
@@ -188,7 +188,7 @@ def test_unit_softmax():
 
     # Test with 2D tensor (batch dimension)
     x = Tensor([[1, 2], [3, 4]])
-    result = softmax.forward(x, axis=-1)  # Softmax along last dimension
+    result = softmax.forward(x, dim=-1)  # Softmax along last dimension
     assert result.shape == (2, 2), "Softmax should preserve input shape"
     # Each row should sum to 1
     row_sums = np.sum(result.data, axis=-1)
@@ -222,7 +222,7 @@ def test_integration_softmax_dimensions():
     softmax = Softmax()
 
     # Test different dimensions
-    result_last = softmax.forward(data_3d, axis=-1)
+    result_last = softmax.forward(data_3d, dim=-1)
     assert result_last.shape == (2, 2, 3), "Softmax should preserve shape"
 
     # Check that last dimension sums to 1

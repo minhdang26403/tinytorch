@@ -1,21 +1,17 @@
 import numpy as np
 
-from tensor import Tensor
+from ..tensor import Tensor
 
 # Constants for weight initialization
 XAVIER_SCALE_FACTOR = 1.0  # Xavier/Glorot initialization uses sqrt(1/fan_in)
 HE_SCALE_FACTOR = 2.0  # He initialization uses sqrt(2/fan_in) for ReLU
 
-# Constants for dropout
-DROPOUT_MIN_PROB = 0.0  # Minimum dropout probability (no dropout)
-DROPOUT_MAX_PROB = 1.0  # Maximum dropout probability (drop everything)
 
-
-class Layer:
+class Module:
     """
-    Base class for all neural network layers.
+    Base class for all neural network modules (layers, containers, etc.).
 
-    All layers should inherit from this class and implement:
+    All modules should inherit from this class and implement:
     - forward(x): Compute layer output
     - parameters(): Return list of trainable parameters
 
@@ -35,7 +31,7 @@ class Layer:
         raise NotImplementedError("Subclasses must implement forward()")
 
     def __call__(self, x: Tensor, *args, **kwargs) -> Tensor:
-        """Allow layer to be called like a function."""
+        """Allow module to be called like a function."""
         return self.forward(x, *args, **kwargs)
 
     def parameters(self) -> list[Tensor]:
@@ -48,11 +44,11 @@ class Layer:
         return []  # Base class has no parameters
 
     def __repr__(self) -> str:
-        """String representation of the layer."""
+        """String representation of the module."""
         return f"{self.__class__.__name__}()"
 
 
-class Linear(Layer):
+class Linear(Module):
     """
     Linear (fully connected) layer: y = xW + b
 
@@ -108,60 +104,12 @@ class Linear(Layer):
         )
 
 
-class Dropout(Layer):
-    """
-    Dropout layer for regularization.
-
-    During training: randomly zeros elements with probability p, scales survivors
-        by 1/(1-p)
-    During inference: passes input through unchanged
-
-    This prevents overfitting by forcing the network to not rely on specific neurons.
-    """
-
-    def __init__(self, p=0.5):
-        """
-        Initialize dropout layer.
-        """
-        if not DROPOUT_MIN_PROB <= p <= DROPOUT_MAX_PROB:
-            raise ValueError(
-                f"Dropout probability must be between {DROPOUT_MIN_PROB} and "
-                f"{DROPOUT_MAX_PROB}, got {p}"
-            )
-        self.p = p
-
-    def forward(self, x: Tensor, training=True) -> Tensor:
-        """
-        Forward pass through dropout layer.
-        """
-        if not training or self.p == DROPOUT_MIN_PROB:
-            # During inference or no dropout, pass through unchanged
-            return x
-
-        if self.p == DROPOUT_MAX_PROB:
-            # Drop everything
-            return np.zeros_like(x.data)
-
-        # During training, apply dropout
-        keep_prob = 1 - self.p
-
-        # Create random mask: True where we keep elements
-        mask = np.random.random(x.data.shape) < keep_prob
-
-        # Apply mask and scale
-        mask_tensor = Tensor(mask.astype(np.float32))
-        scale = 1 / keep_prob
-        output = x * mask_tensor * scale
-
-        return output
-
-
-class Sequential:
+class Sequential(Module):
     """
     Container that chains layers together sequentially.
     """
 
-    def __init__(self, *layers: Layer):
+    def __init__(self, *layers: Module):
         """Initialize with layers to chain together."""
         # Accept both Sequential(layer1, layer2) and Sequential([layer1, layer2])
         if len(layers) == 1 and isinstance(layers[0], (list, tuple)):
@@ -184,6 +132,7 @@ class Sequential:
         params = []
         for layer in self.layers:
             params.extend(layer.parameters())
+        return params
 
     def __repr__(self) -> str:
         layer_reprs = ", ".join(repr(layer) for layer in self.layers)

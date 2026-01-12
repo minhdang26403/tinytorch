@@ -19,9 +19,10 @@ dev = [
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["tensor*", "activations*", "optimizers*", "layers*"]
+include = ["tinytorch*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["test"]
 python_files = ["test_*.py"]
 python_functions = ["test_*"]
+pythonpath = ["."]
