@@ -18,7 +18,7 @@ class Tensor:
     All arithmetic, matrix, and shape operations are built on this foundation.
     """
 
-    def __init__(self, data):
+    def __init__(self, data, requires_grad=False):
         self.data = np.array(data, dtype=np.float32)
         self.shape = self.data.shape
         self.size = self.data.size
