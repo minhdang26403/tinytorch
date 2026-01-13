@@ -3,9 +3,9 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "mlsys-practice"
+name = "tinytorch"
 version = "0.1.0"
-description = "ML Systems practice - educational deep learning framework"
+description = "TinyTorch - educational deep learning framework"
 readme = "README.md"
 requires-python = ">=3.8"
 dependencies = [
