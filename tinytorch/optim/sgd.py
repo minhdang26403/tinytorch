@@ -18,7 +18,9 @@ class SGD:
         self.lr = float(lr)
 
     def step(self) -> None:
-        """Update parameters in-place (no-op until gradients are available)."""
+        """
+        Update parameters in-place (no-op until gradients are available).
+        """
         # Intentionally left blank until grad fields are introduced.
         return None
 

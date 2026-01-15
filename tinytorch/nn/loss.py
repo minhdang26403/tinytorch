@@ -22,10 +22,14 @@ def log_softmax(x: Tensor, dim: int = -1) -> Tensor:
 
 
 class MSELoss:
-    """Mean Squared Error loss for regression tasks."""
+    """
+    Mean Squared Error loss for regression tasks.
+    """
 
     def __init__(self):
-        """Initialize MSE loss function."""
+        """
+        Initialize MSE loss function.
+        """
         pass
 
     def forward(self, predictions: Tensor, targets: Tensor) -> Tensor:
@@ -38,10 +42,12 @@ class MSELoss:
         return Tensor(mse)
 
     def __call__(self, predictions: Tensor, targets: Tensor) -> Tensor:
-        """Allows the loss function to be called like a function."""
+        """
+        Allows the loss function to be called like a function.
+        """
         return self.forward(predictions, targets)
 
-    def backward(self, grad: Tensor) -> None:
+    def backward(self) -> None:
         """
         Compute gradients.
         """
@@ -49,10 +55,14 @@ class MSELoss:
 
 
 class CrossEntropyLoss:
-    """Cross-entropy loss for multi-class classification."""
+    """
+    Cross-entropy loss for multi-class classification.
+    """
 
     def __init__(self):
-        """Initialize cross-entropy loss function."""
+        """
+        Initialize cross-entropy loss function.
+        """
         pass
 
     def forward(self, logits: Tensor, targets: Tensor) -> Tensor:
@@ -72,10 +82,12 @@ class CrossEntropyLoss:
         return Tensor(cross_entropy_loss)
 
     def __call__(self, logits: Tensor, targets: Tensor) -> Tensor:
-        """Allows the loss function to be called like a function."""
+        """
+        Allows the loss function to be called like a function.
+        """
         return self.forward(logits, targets)
 
-    def backward(self, grad: Tensor) -> None:
+    def backward(self) -> None:
         """
         Compute gradients.
         """
@@ -83,10 +95,14 @@ class CrossEntropyLoss:
 
 
 class BinaryCrossEntropyLoss:
-    """Binary cross-entropy loss for binary classification."""
+    """
+    Binary cross-entropy loss for binary classification.
+    """
 
     def __init__(self):
-        """Initialize binary cross-entropy loss function."""
+        """
+        Initialize binary cross-entropy loss function.
+        """
         pass
 
     def forward(self, predictions: Tensor, targets: Tensor) -> Tensor:
@@ -110,7 +126,9 @@ class BinaryCrossEntropyLoss:
         return Tensor(bce_loss)
 
     def __call__(self, predictions: Tensor, targets: Tensor) -> Tensor:
-        """Allows the loss function to be called like a function."""
+        """
+        Allows the loss function to be called like a function.
+        """
         return self.forward(predictions, targets)
 
     def backward(self) -> None:

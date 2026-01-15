@@ -1,4 +1,6 @@
-"""Neural network modules, activations, and losses for TinyTorch."""
+"""
+Neural network modules, activations, and losses for TinyTorch.
+"""
 
 from .activation import GELU, ReLU, Sigmoid, Softmax, Tanh
 from .dropout import Dropout

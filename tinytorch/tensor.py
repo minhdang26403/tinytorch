@@ -25,22 +25,26 @@ class Tensor:
         self.dtype = self.data.dtype
 
     def __repr__(self):
-        """String representation of tensor for debugging."""
+        """
+        String representation of tensor for debugging.
+        """
         return f"Tensor(data={self.data}, shape={self.shape})"
 
     def __str__(self):
-        """Human-readable string representation."""
+        """
+        Human-readable string representation.
+        """
         return f"Tensor({self.data})"
 
     def numpy(self):
-        """Return the underlying NumPy array."""
+        """
+        Return the underlying NumPy array.
+        """
         return self.data
 
     def memory_footprint(self):
-        """Calculate exact memory usage in bytes.
-
-        Systems Concept: Understanding memory footprint is fundamental to ML systems.
-        Before running any operation, engineers should know how much memory it requires.
+        """
+        Calculate exact memory usage in bytes.
 
         Returns:
             int: Memory usage in bytes (e.g., 1000x1000 float32 = 4MB)
@@ -48,35 +52,45 @@ class Tensor:
         return self.data.nbytes
 
     def __add__(self, other):
-        """Add two tensors element-wise with broadcasting support."""
+        """
+        Add two tensors element-wise with broadcasting support.
+        """
         if isinstance(other, Tensor):
             return Tensor(self.data + other.data)
         else:
             return Tensor(self.data + other)
 
     def __sub__(self, other):
-        """Subtract two tensors element-wise."""
+        """
+        Subtract two tensors element-wise.
+        """
         if isinstance(other, Tensor):
             return Tensor(self.data - other.data)
         else:
             return Tensor(self.data - other)
 
     def __mul__(self, other):
-        """Multiply two tensors element-wise (NOT matrix multiplication)."""
+        """
+        Multiply two tensors element-wise (NOT matrix multiplication).
+        """
         if isinstance(other, Tensor):
             return Tensor(self.data * other.data)
         else:
             return Tensor(self.data * other)
 
     def __truediv__(self, other):
-        """Divide two tensors element-wise."""
+        """
+        Divide two tensors element-wise.
+        """
         if isinstance(other, Tensor):
             return Tensor(self.data / other.data)
         else:
             return Tensor(self.data / other)
 
     def matmul(self, other):
-        """Matrix multiplication of two tensors."""
+        """
+        Matrix multiplication of two tensors.
+        """
 
         if not isinstance(other, Tensor):
             raise TypeError(
@@ -100,15 +114,21 @@ class Tensor:
         return Tensor(self.data @ other.data)
 
     def __matmul__(self, other):
-        """Enable @ operator for matrix multiplication."""
+        """
+        Enable @ operator for matrix multiplication.
+        """
         return self.matmul(other)
 
     def __getitem__(self, key):
-        """Enable indexing and slicing operations on Tensors."""
+        """
+        Enable indexing and slicing operations on Tensors.
+        """
         return Tensor(self.data[key])
 
     def reshape(self, *shape):
-        """Reshape tensor to new dimensions with basic validation."""
+        """
+        Reshape tensor to new dimensions with basic validation.
+        """
         if len(shape) == 1 and isinstance(shape[0], (tuple, list)):
             shape = tuple(shape[0])
         else:
@@ -142,7 +162,9 @@ class Tensor:
         return Tensor(self.data.reshape(computed_shape))
 
     def transpose(self, dim0=None, dim1=None):
-        """Transpose tensor dimensions."""
+        """
+        Transpose tensor dimensions.
+        """
         if dim0 is None and dim1 is None:
             if len(self.shape) < 2:
                 return Tensor(self.data.copy())
@@ -159,13 +181,19 @@ class Tensor:
         return Tensor(transposed_data)
 
     def sum(self, axis=None, keepdims=False):
-        """Sum tensor along specified axis."""
+        """
+        Sum tensor along specified axis.
+        """
         return Tensor(self.data.sum(axis=axis, keepdims=keepdims))
 
     def mean(self, axis=None, keepdims=False):
-        """Compute mean of tensor along specified axis."""
+        """
+        Compute mean of tensor along specified axis.
+        """
         return Tensor(self.data.mean(axis=axis, keepdims=keepdims))
 
     def max(self, axis=None, keepdims=False):
-        """Find maximum values along specified axis."""
+        """
+        Find maximum values along specified axis.
+        """
         return Tensor(self.data.max(axis=axis, keepdims=keepdims))

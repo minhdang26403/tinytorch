@@ -31,7 +31,9 @@ class Module:
         raise NotImplementedError("Subclasses must implement forward()")
 
     def __call__(self, x: Tensor, *args, **kwargs) -> Tensor:
-        """Allow module to be called like a function."""
+        """
+        Allow module to be called like a function.
+        """
         return self.forward(x, *args, **kwargs)
 
     def parameters(self) -> list[Tensor]:
@@ -44,7 +46,9 @@ class Module:
         return []  # Base class has no parameters
 
     def __repr__(self) -> str:
-        """String representation of the module."""
+        """
+        String representation of the module.
+        """
         return f"{self.__class__.__name__}()"
 
 
@@ -96,7 +100,9 @@ class Linear(Module):
         return params
 
     def __repr__(self) -> str:
-        """String representation for debugging."""
+        """
+        String representation for debugging.
+        """
         bias_str = f", bias={self.bias is not None}"
         return (
             f"Linear(in_features={self.in_features}, "
@@ -110,25 +116,33 @@ class Sequential(Module):
     """
 
     def __init__(self, *layers: Module):
-        """Initialize with layers to chain together."""
+        """
+        Initialize with layers to chain together.
+        """
         # Accept both Sequential(layer1, layer2) and Sequential([layer1, layer2])
         if len(layers) == 1 and isinstance(layers[0], (list, tuple)):
-            self.layers = layers[0]
+            self.layers = tuple(layers[0])
         else:
-            self.layers = list(layers)
+            self.layers = layers
 
     def forward(self, x: Tensor) -> Tensor:
-        """Forward pass through all layers sequentially."""
+        """
+        Forward pass through all layers sequentially.
+        """
         for layer in self.layers:
             x = layer.forward(x)
         return x
 
     def __call__(self, x: Tensor, *arg, **kwargs) -> Tensor:
-        """Allow model to be called like a function."""
+        """
+        Allow model to be called like a function.
+        """
         return self.forward(x)
 
     def parameters(self) -> list[Tensor]:
-        """Collect all parameters from all layers."""
+        """
+        Collect all parameters from all layers.
+        """
         params = []
         for layer in self.layers:
             params.extend(layer.parameters())

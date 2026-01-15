@@ -154,7 +154,9 @@ def test_unit_dropout_layer():
 
 
 def analyze_layer_memory():
-    """Analyze memory usage patterns in layer operations."""
+    """
+    Analyze memory usage patterns in layer operations.
+    """
 
     # Test different layer sizes
     layer_configs = [
@@ -174,7 +176,8 @@ def analyze_layer_memory():
         total_memory = weight_memory + bias_memory
 
         print(
-            f"({in_feat:4d}, {out_feat:4d}) → {weight_memory / 1024:7.1f} KB → {bias_memory / 1024:6.1f} KB → {total_memory / 1024:7.1f} KB"
+            f"({in_feat:4d}, {out_feat:4d}) → {weight_memory / 1024:7.1f} KB → "
+            f"{bias_memory / 1024:6.1f} KB → {total_memory / 1024:7.1f} KB"
         )
 
     # Analyze multi-layer memory scaling
@@ -214,7 +217,8 @@ def analyze_layer_performance():
         total_flops = matmul_flops + bias_flops
 
         print(
-            f"{batch_size:10d} → {matmul_flops:15,} → {bias_flops:13,} → {total_flops:11,}"
+            f"{batch_size:10d} → {matmul_flops:15,} → {bias_flops:13,} → "
+            f"{total_flops:11,}"
         )
 
     # Add timing measurements
@@ -239,7 +243,8 @@ def analyze_layer_performance():
         throughput = (batch_size * iterations) / elapsed
 
         print(
-            f"{batch_size:10d} → {time_per_forward:8.3f} ms → {throughput:12,.0f} samples/sec"
+            f"{batch_size:10d} → {time_per_forward:8.3f} ms → "
+            f"{throughput:12,.0f} samples/sec"
         )
 
     print("\n💡 Key Insights:")

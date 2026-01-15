@@ -201,7 +201,9 @@ class Compose:
         self.transforms = transforms
 
     def __call__(self, x: Tensor) -> Tensor:
-        """Apply all transforms in sequence."""
+        """
+        Apply all transforms in sequence.
+        """
         for transform in self.transforms:
             x = transform(x)
         return x

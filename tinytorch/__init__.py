@@ -1,4 +1,8 @@
-"""TinyTorch: a lightweight, educational deep learning toolkit."""
+"""
+TinyTorch: a lightweight, educational deep learning toolkit.
+
+This module provides the core components for building and training neural networks.
+"""
 
 from . import nn, optim
 from .tensor import Tensor

@@ -12,7 +12,9 @@ class Sigmoid:
     """
 
     def parameters(self):
-        """Return empty list (activations have no learnable parameters)."""
+        """
+        Return empty list (activations have no learnable parameters).
+        """
         return []
 
     def forward(self, x: Tensor) -> Tensor:
@@ -40,11 +42,15 @@ class Sigmoid:
         return Tensor(result_data)
 
     def __call__(self, x: Tensor) -> Tensor:
-        """Allows the activation to be called like a function."""
+        """
+        Allows the activation to be called like a function.
+        """
         return self.forward(x)
 
     def backward(self, grad: Tensor) -> None:
-        """Compute gradient."""
+        """
+        Compute gradient.
+        """
         pass
 
 
@@ -57,19 +63,27 @@ class ReLU:
     """
 
     def parameters(self):
-        """Return empty list (activations have no learnable parameters)."""
+        """
+        Return empty list (activations have no learnable parameters).
+        """
         return []
 
     def forward(self, x: Tensor) -> Tensor:
-        """Apply ReLU activation element-wise."""
+        """
+        Apply ReLU activation element-wise.
+        """
         return Tensor(np.maximum(x.data, 0))
 
     def __call__(self, x: Tensor) -> Tensor:
-        """Allows the activation to be called like a function."""
+        """
+        Allows the activation to be called like a function.
+        """
         return self.forward(x)
 
     def backward(self, grad: Tensor) -> None:
-        """Compute gradient."""
+        """
+        Compute gradient.
+        """
         pass
 
 
@@ -82,19 +96,27 @@ class Tanh:
     """
 
     def parameters(self):
-        """Return empty list (activations have no learnable parameters)."""
+        """
+        Return empty list (activations have no learnable parameters).
+        """
         return []
 
     def forward(self, x: Tensor) -> Tensor:
-        """Apply tanh activation element-wise."""
+        """
+        Apply tanh activation element-wise.
+        """
         return Tensor(np.tanh(x.data))
 
     def __call__(self, x: Tensor) -> Tensor:
-        """Allows the activation to be called like a function."""
+        """
+        Allows the activation to be called like a function.
+        """
         return self.forward(x)
 
     def backward(self, grad: Tensor) -> None:
-        """Compute gradient."""
+        """
+        Compute gradient.
+        """
         pass
 
 
@@ -107,11 +129,15 @@ class GELU:
     """
 
     def parameters(self):
-        """Return empty list (activations have no learnable parameters)."""
+        """
+        Return empty list (activations have no learnable parameters).
+        """
         return []
 
     def forward(self, x: Tensor) -> Tensor:
-        """Apply GELU activation element-wise."""
+        """
+        Apply GELU activation element-wise.
+        """
         # GELU approximation: x * sigmoid(1.702 * x)
         # First compute sigmoid part
         sigmoid_part = 1.0 / (1.0 + np.exp(-1.702 * x.data))
@@ -120,17 +146,30 @@ class GELU:
         return Tensor(result)
 
     def __call__(self, x: Tensor) -> Tensor:
-        """Allows the activation to be called like a function."""
+        """
+        Allows the activation to be called like a function.
+        """
         return self.forward(x)
 
     def backward(self, grad: Tensor) -> None:
-        """Compute gradient."""
+        """
+        Compute gradient.
+        """
         pass
 
 
 class Softmax:
+    """
+    Softmax activation: f(x) = exp(x) / sum(exp(x))
+
+    Maps any real number to (0, 1) range.
+    Perfect for probabilities and multi-class classification.
+    """
+
     def parameters(self):
-        """Return empty list (activations have no learnable parameters)."""
+        """
+        Return empty list (activations have no learnable parameters).
+        """
         return []
 
     def forward(self, x: Tensor, dim: int = -1) -> Tensor:
@@ -152,7 +191,13 @@ class Softmax:
         return Tensor(result)
 
     def __call__(self, x: Tensor) -> Tensor:
+        """
+        Allows the activation to be called like a function.
+        """
         return self.forward(x)
 
     def backward(self, grad: Tensor) -> None:
+        """
+        Compute gradient.
+        """
         pass
