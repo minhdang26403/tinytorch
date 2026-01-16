@@ -249,14 +249,15 @@ class ReshapeFunction(Function):
         (a, shape) = args
         a = np.asanyarray(a)
         if ctx is not None:
-            ctx.save_for_backward(shape)
+            # Save the ORIGINAL shape for backward
+            ctx.save_for_backward(a.shape)
         return a.reshape(shape)
 
     @staticmethod
     def backward(ctx: Context, grad_output: np.ndarray) -> tuple[np.ndarray, ...]:
-        (shape,) = ctx.saved_inputs
-        grad_a = grad_output.reshape(shape)
-        # Return None for the 'shape' argument
+        (original_shape,) = ctx.saved_inputs
+        # Reshape gradient back to original shape
+        grad_a = grad_output.reshape(original_shape)
         return (grad_a,)
 
 

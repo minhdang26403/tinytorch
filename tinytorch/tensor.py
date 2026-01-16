@@ -241,14 +241,18 @@ class Tensor:
             # Use the output gradient to compute the gradient of this node's inputs.
             # If it's a math op, it returns gradients for inputs.
             # If it's AccumulateGrad, it writes to .grad and returns None.
+            if isinstance(node, AccumulateGrad):
+                node.backward(grad_output)
+                continue
+
             grad_inputs = node.backward(node.ctx, grad_output)
 
             for grad_input, next_node in zip(grad_inputs, node.next_functions):
-                if next_node is None:
+                if next_node is not None:
                     if next_node not in grads:
                         grads[next_node] = grad_input
                     else:
-                        grads[next_node] += grad_input
+                        grads[next_node] = grads[next_node] + grad_input
 
     @staticmethod
     def _find_topological_order(node: Function) -> list[Function]:
