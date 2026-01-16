@@ -18,23 +18,24 @@ class Module:
     The __call__ method is provided to make layers callable.
     """
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, *args, **kwargs) -> Tensor:
         """
         Forward pass through the layer.
 
         Args:
-            x: Input tensor
+            *args: Input tensors
+            **kwargs: Additional arguments
 
         Returns:
             Output tensor after transformation
         """
         raise NotImplementedError("Subclasses must implement forward()")
 
-    def __call__(self, x: Tensor, *args, **kwargs) -> Tensor:
+    def __call__(self, *args, **kwargs) -> Tensor:
         """
         Allow module to be called like a function.
         """
-        return self.forward(x, *args, **kwargs)
+        return self.forward(*args, **kwargs)
 
     def parameters(self) -> list[Tensor]:
         """
@@ -130,14 +131,8 @@ class Sequential(Module):
         Forward pass through all layers sequentially.
         """
         for layer in self.layers:
-            x = layer.forward(x)
+            x = layer(x)
         return x
-
-    def __call__(self, x: Tensor, *arg, **kwargs) -> Tensor:
-        """
-        Allow model to be called like a function.
-        """
-        return self.forward(x)
 
     def parameters(self) -> list[Tensor]:
         """

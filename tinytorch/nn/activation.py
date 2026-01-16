@@ -1,60 +1,22 @@
-import numpy as np
+"""
+Activation function modules for neural networks.
 
+These are thin wrappers around the autograd Function classes,
+providing a Module interface for use in Sequential and other containers.
+"""
+
+from ..autograd import (
+    GELUFunction,
+    ReLUFunction,
+    SigmoidFunction,
+    SoftmaxFunction,
+    TanhFunction,
+)
 from ..tensor import Tensor
+from .module import Module
 
 
-class Sigmoid:
-    """
-    Sigmoid activation
-
-    Maps any real number to (0, 1) range.
-    Perfect for probabilities and binary classification.
-    """
-
-    def parameters(self):
-        """
-        Return empty list (activations have no learnable parameters).
-        """
-        return []
-
-    def forward(self, x: Tensor) -> Tensor:
-        """
-        Apply sigmoid activation element-wise.
-        """
-        # Clip extreme values to prevent overflow (sigmoid(-500) ~ 0, sigmoid(500) ~ 1)
-        # Clipping activations to (-500, 500) ensures exp() stays within float64 range
-        z = np.clip(x.data, -500, 500)
-
-        # Use numerically stable sigmoid
-        # For positive values: 1 / (1 + exp(-x))
-        # For negative values: exp(x) / (1 + exp(x)) = 1 / (1 + exp(-x)) after clipping
-        result_data = np.zeros_like(z)
-
-        # Positive values (including zero)
-        pos_mask = z >= 0
-        result_data[pos_mask] = 1.0 / (1.0 + np.exp(-z[pos_mask]))
-
-        # Negative values
-        neg_mask = z < 0
-        exp_z = np.exp(z[neg_mask])
-        result_data[neg_mask] = exp_z / (1.0 + exp_z)
-
-        return Tensor(result_data)
-
-    def __call__(self, x: Tensor) -> Tensor:
-        """
-        Allows the activation to be called like a function.
-        """
-        return self.forward(x)
-
-    def backward(self, grad: Tensor) -> None:
-        """
-        Compute gradient.
-        """
-        pass
-
-
-class ReLU:
+class ReLU(Module):
     """
     ReLU activation: f(x) = max(0, x)
 
@@ -62,32 +24,29 @@ class ReLU:
     Most popular activation for hidden layers.
     """
 
-    def parameters(self):
-        """
-        Return empty list (activations have no learnable parameters).
-        """
-        return []
+    def forward(self, x: Tensor) -> Tensor:
+        return ReLUFunction.apply(x)
+
+    def __repr__(self) -> str:
+        return "ReLU()"
+
+
+class Sigmoid(Module):
+    """
+    Sigmoid activation: f(x) = 1 / (1 + exp(-x))
+
+    Maps any real number to (0, 1) range.
+    Perfect for probabilities and binary classification.
+    """
 
     def forward(self, x: Tensor) -> Tensor:
-        """
-        Apply ReLU activation element-wise.
-        """
-        return Tensor(np.maximum(x.data, 0))
+        return SigmoidFunction.apply(x)
 
-    def __call__(self, x: Tensor) -> Tensor:
-        """
-        Allows the activation to be called like a function.
-        """
-        return self.forward(x)
-
-    def backward(self, grad: Tensor) -> None:
-        """
-        Compute gradient.
-        """
-        pass
+    def __repr__(self) -> str:
+        return "Sigmoid()"
 
 
-class Tanh:
+class Tanh(Module):
     """
     Tanh activation: f(x) = (e^x - e^(-x))/(e^x + e^(-x))
 
@@ -95,109 +54,47 @@ class Tanh:
     Zero-centered alternative to sigmoid.
     """
 
-    def parameters(self):
-        """
-        Return empty list (activations have no learnable parameters).
-        """
-        return []
-
     def forward(self, x: Tensor) -> Tensor:
-        """
-        Apply tanh activation element-wise.
-        """
-        return Tensor(np.tanh(x.data))
+        return TanhFunction.apply(x)
 
-    def __call__(self, x: Tensor) -> Tensor:
-        """
-        Allows the activation to be called like a function.
-        """
-        return self.forward(x)
-
-    def backward(self, grad: Tensor) -> None:
-        """
-        Compute gradient.
-        """
-        pass
+    def __repr__(self) -> str:
+        return "Tanh()"
 
 
-class GELU:
+class GELU(Module):
     """
-    GELU activation: f(x) = x * Φ(x) ≈ x * Sigmoid(1.702 * x)
+    GELU activation: f(x) = x * Φ(x)
 
     Smooth approximation to ReLU, used in modern transformers.
     Where Φ(x) is the cumulative distribution function of standard normal.
     """
 
-    def parameters(self):
-        """
-        Return empty list (activations have no learnable parameters).
-        """
-        return []
-
     def forward(self, x: Tensor) -> Tensor:
-        """
-        Apply GELU activation element-wise.
-        """
-        # GELU approximation: x * sigmoid(1.702 * x)
-        # First compute sigmoid part
-        sigmoid_part = 1.0 / (1.0 + np.exp(-1.702 * x.data))
-        # Then multiply by x
-        result = x.data * sigmoid_part
-        return Tensor(result)
+        return GELUFunction.apply(x)
 
-    def __call__(self, x: Tensor) -> Tensor:
-        """
-        Allows the activation to be called like a function.
-        """
-        return self.forward(x)
-
-    def backward(self, grad: Tensor) -> None:
-        """
-        Compute gradient.
-        """
-        pass
+    def __repr__(self) -> str:
+        return "GELU()"
 
 
-class Softmax:
+class Softmax(Module):
     """
     Softmax activation: f(x) = exp(x) / sum(exp(x))
 
-    Maps any real number to (0, 1) range.
-    Perfect for probabilities and multi-class classification.
+    Converts logits to probability distribution.
+    Output sums to 1 along the specified dimension.
     """
 
-    def parameters(self):
+    def __init__(self, dim: int = -1):
         """
-        Return empty list (activations have no learnable parameters).
+        Args:
+            dim: Dimension along which to compute softmax (default: -1, last dim)
         """
-        return []
+        self.dim = dim
 
-    def forward(self, x: Tensor, dim: int = -1) -> Tensor:
-        """
-        Apply softmax activation along specified dimension.
-        """
-        # Numerical stability: subtract max to prevent overflow
-        x_max = np.max(x.data, axis=dim, keepdims=True)
-        x_shifted = x.data - x_max  # Tensor subtraction
+    def forward(self, x: Tensor, dim: int | None = None) -> Tensor:
+        # Allow overriding dim at call time
+        actual_dim = dim if dim is not None else self.dim
+        return SoftmaxFunction.apply(x, actual_dim)
 
-        # Compute exponentials
-        exp_values = np.exp(x_shifted)
-
-        # Sum along dimension
-        exp_sum = np.sum(exp_values, axis=dim, keepdims=True)
-
-        # Normalize to get probabilities
-        result = exp_values / exp_sum
-        return Tensor(result)
-
-    def __call__(self, x: Tensor) -> Tensor:
-        """
-        Allows the activation to be called like a function.
-        """
-        return self.forward(x)
-
-    def backward(self, grad: Tensor) -> None:
-        """
-        Compute gradient.
-        """
-        pass
+    def __repr__(self) -> str:
+        return f"Softmax(dim={self.dim})"

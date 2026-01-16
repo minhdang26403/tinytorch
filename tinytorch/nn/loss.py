@@ -1,138 +1,79 @@
+"""
+Loss function modules for neural networks.
+
+These are thin wrappers around the autograd Function classes,
+providing a Module interface consistent with PyTorch's loss functions.
+"""
+
 import numpy as np
 
+from ..autograd import (
+    BinaryCrossEntropyFunction,
+    CrossEntropyFunction,
+    MSEFunction,
+)
 from ..tensor import Tensor
-
-# Constants for numerical stability
-EPSILON = 1e-7  # Small value to prevent log(0) and numerical instability
+from .module import Module
 
 
 def log_softmax(x: Tensor, dim: int = -1) -> Tensor:
     """
     Compute log-softmax in a numerically stable way.
-    """
 
-    # Subtract input from max value to prevent overflow
+    Args:
+        x: Input tensor
+        dim: Dimension along which to compute log-softmax
+
+    Returns:
+        Tensor with log-softmax applied
+    """
+    # Subtract max for numerical stability
     x_max = np.max(x.data, axis=dim, keepdims=True)
     x_shifted = x.data - x_max
-
     log_sum_exp = np.log(np.sum(np.exp(x_shifted), axis=dim, keepdims=True))
-    result_data = x.data - x_max - log_sum_exp
+    result_data = x_shifted - log_sum_exp
+    return Tensor(result_data, requires_grad=x.requires_grad)
 
-    return Tensor(result_data)
 
-
-class MSELoss:
+class MSELoss(Module):
     """
     Mean Squared Error loss for regression tasks.
+
+    Computes: mean((predictions - targets)^2)
     """
 
-    def __init__(self):
-        """
-        Initialize MSE loss function.
-        """
-        pass
-
     def forward(self, predictions: Tensor, targets: Tensor) -> Tensor:
-        """
-        Compute mean squared error between predictions and targets.
-        """
-        error = predictions.data - targets.data
-        squared_error = error**2
-        mse = np.mean(squared_error)
-        return Tensor(mse)
+        return MSEFunction.apply(predictions, targets)
 
-    def __call__(self, predictions: Tensor, targets: Tensor) -> Tensor:
-        """
-        Allows the loss function to be called like a function.
-        """
-        return self.forward(predictions, targets)
-
-    def backward(self) -> None:
-        """
-        Compute gradients.
-        """
-        pass
+    def __repr__(self) -> str:
+        return "MSELoss()"
 
 
-class CrossEntropyLoss:
+class CrossEntropyLoss(Module):
     """
     Cross-entropy loss for multi-class classification.
-    """
 
-    def __init__(self):
-        """
-        Initialize cross-entropy loss function.
-        """
-        pass
+    Combines softmax and negative log-likelihood in a numerically stable way.
+    Takes raw logits (unnormalized scores) and target class indices.
+    """
 
     def forward(self, logits: Tensor, targets: Tensor) -> Tensor:
-        """
-        Compute cross-entropy loss between logits and target class indices.
-        """
-        # Compute probabilities for each class
-        log_probs = log_softmax(logits)
+        return CrossEntropyFunction.apply(logits, targets)
 
-        batch_size = targets.shape[0]
-        target_indices = targets.data.astype(int)
-
-        # Select correct class probabilities using advanced indexing
-        selected_log_probs = log_probs.data[np.arange(batch_size), target_indices]
-        cross_entropy_loss = np.mean(-selected_log_probs)
-
-        return Tensor(cross_entropy_loss)
-
-    def __call__(self, logits: Tensor, targets: Tensor) -> Tensor:
-        """
-        Allows the loss function to be called like a function.
-        """
-        return self.forward(logits, targets)
-
-    def backward(self) -> None:
-        """
-        Compute gradients.
-        """
-        pass
+    def __repr__(self) -> str:
+        return "CrossEntropyLoss()"
 
 
-class BinaryCrossEntropyLoss:
+class BinaryCrossEntropyLoss(Module):
     """
     Binary cross-entropy loss for binary classification.
+
+    Takes predictions (after sigmoid, in range [0, 1]) and binary targets.
+    Computes: -mean(target * log(pred) + (1 - target) * log(1 - pred))
     """
 
-    def __init__(self):
-        """
-        Initialize binary cross-entropy loss function.
-        """
-        pass
-
     def forward(self, predictions: Tensor, targets: Tensor) -> Tensor:
-        """
-        Compute binary cross-entropy loss.
-        """
+        return BinaryCrossEntropyFunction.apply(predictions, targets)
 
-        # Clamp predictions to avoid numerical issues with log(0) and log(1)
-        eps = EPSILON
-        clamped_preds = np.clip(predictions.data, eps, 1 - eps)
-
-        # Compute binary cross-entropy
-        log_preds = np.log(clamped_preds)
-        log_one_minus_preds = np.log(1 - clamped_preds)
-        bce_per_sample = -(
-            targets.data * log_preds + (1 - targets.data) * log_one_minus_preds
-        )
-
-        # Return mean across all samples
-        bce_loss = np.mean(bce_per_sample)
-        return Tensor(bce_loss)
-
-    def __call__(self, predictions: Tensor, targets: Tensor) -> Tensor:
-        """
-        Allows the loss function to be called like a function.
-        """
-        return self.forward(predictions, targets)
-
-    def backward(self) -> None:
-        """
-        Compute gradients.
-        """
-        pass
+    def __repr__(self) -> str:
+        return "BinaryCrossEntropyLoss()"

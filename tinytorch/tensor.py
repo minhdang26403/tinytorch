@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import numpy as np
 
 from tinytorch.autograd import (
@@ -174,12 +176,24 @@ class Tensor:
 
         return ReshapeFunction.apply(self, shape)
 
-    def transpose(self, axes=None):
+    def transpose(self, *args, axes=None):
         """
         Transpose tensor dimensions.
-        """
 
-        return TransposeFunction.apply(self, axes=axes)
+        Can be called as:
+        - transpose(): reverse all dimensions
+        - transpose(axes=(2, 0, 1)): full permutation
+        - transpose(0, 2) or transpose(axes=(0, 2)): swap two axes
+        """
+        # Handle positional args: transpose(0, 2) means swap axes 0 and 2
+        if args:
+            axes = args
+
+        # If axes is a 2-tuple on an N-D array (N > 2), treat as swapaxes
+        if axes is not None and len(axes) == 2 and len(self.shape) > 2:
+            return TransposeFunction.apply(self, axes=axes, swap_mode=True)
+
+        return TransposeFunction.apply(self, axes=axes, swap_mode=False)
 
     def sum(self, axis=None, keepdims=False):
         """

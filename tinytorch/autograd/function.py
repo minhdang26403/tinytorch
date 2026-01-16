@@ -5,9 +5,16 @@ Following PyTorch's pattern, each operation is a Function subclass
 that implements both forward() and backward() static methods.
 """
 
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 import numpy as np
 
 from .context import Context
+
+if TYPE_CHECKING:
+    from ..tensor import Tensor
 
 
 class Function:
@@ -31,16 +38,16 @@ class Function:
         raise NotImplementedError
 
     @classmethod
-    def apply(cls, *args):
+    def apply(cls, *args, **kwargs):
         from ..tensor import Tensor
 
         # The forward pass code will work directly on the underlying data, not tensor
-        raw_inputs = (arg.data if isinstance(arg, Tensor) else arg for arg in args)
+        raw_inputs = tuple(arg.data if isinstance(arg, Tensor) else arg for arg in args)
         requires_grad = any(
             isinstance(arg, Tensor) and arg.requires_grad for arg in args
         )
         ctx = Context() if requires_grad else None
-        output_data = cls.forward(ctx, *raw_inputs)
+        output_data = cls.forward(ctx, *raw_inputs, **kwargs)
         output = Tensor(output_data, requires_grad=requires_grad)
 
         if requires_grad:
@@ -64,8 +71,6 @@ class Function:
 
 
 class AccumulateGrad(Function):
-    from ..tensor import Tensor
-
     def __init__(self, tensor: Tensor):
         super().__init__()
         self.variable = tensor
@@ -257,16 +262,29 @@ class ReshapeFunction(Function):
 
 class TransposeFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
-        (a, axes) = args
+    def forward(ctx: Context, *args, axes=None, swap_mode=False) -> np.ndarray:
+        (a,) = args
         a = np.asanyarray(a)
-        if ctx is not None:
-            ctx.save_for_backward(axes)
-        return a.transpose(axes)
+
+        if swap_mode and axes is not None and len(axes) == 2:
+            # Swap two axes using swapaxes
+            if ctx is not None:
+                ctx.save_for_backward(axes, True)  # True = swap_mode
+            return a.swapaxes(axes[0], axes[1])
+        else:
+            # Full permutation using transpose
+            if ctx is not None:
+                ctx.save_for_backward(axes, False)  # False = full permutation
+            return a.transpose(axes)
 
     @staticmethod
     def backward(ctx: Context, grad_output: np.ndarray) -> tuple[np.ndarray, ...]:
-        (axes,) = ctx.saved_inputs
+        axes, swap_mode = ctx.saved_inputs
+
+        if swap_mode:
+            # Swapping is its own inverse
+            return (grad_output.swapaxes(axes[0], axes[1]),)
+
         if axes is None:
             # Default transpose reverses all dims; it is its own inverse
             return (grad_output.transpose(),)
@@ -280,12 +298,12 @@ class TransposeFunction(Function):
 
 class SumFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
-        (a, axis, keepdims) = args
+    def forward(ctx: Context, *args, axis=None, keepdims=False) -> np.ndarray:
+        (a,) = args
         a = np.asanyarray(a)
         if ctx is not None:
-            ctx.save_for_backward(axis, keepdims)
-        return a.sum(axis, keepdims)
+            ctx.save_for_backward(a.shape, axis, keepdims)
+        return a.sum(axis=axis, keepdims=keepdims)
 
     @staticmethod
     def backward(ctx: Context, grad_output: np.ndarray) -> tuple[np.ndarray, ...]:
@@ -315,8 +333,8 @@ class SumFunction(Function):
 
 class MeanFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
-        (a, axis, keepdims) = args
+    def forward(ctx: Context, *args, axis=None, keepdims=False) -> np.ndarray:
+        (a,) = args
         a = np.asanyarray(a)
 
         # 1. Perform the mean
@@ -354,8 +372,8 @@ class MeanFunction(Function):
 
 class MaxFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
-        (a, axis, keepdims) = args
+    def forward(ctx: Context, *args, axis=None, keepdims=False) -> np.ndarray:
+        (a,) = args
         a = np.asanyarray(a)
 
         # 1. Compute the maximum
@@ -431,9 +449,17 @@ class SigmoidFunction(Function):
     @staticmethod
     def forward(ctx: Context, *args) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
-        # Numerically stable sigmoid
-        result = np.where(a >= 0, 1 / (1 + np.exp(-a)), np.exp(a) / (1 + np.exp(a)))
+        z = np.asanyarray(a)
+        # Numerically stable sigmoid using mask-based computation
+        # This avoids computing exp(z) for large positive z (which overflows)
+        result = np.zeros_like(z)
+        pos_mask = z >= 0
+        neg_mask = ~pos_mask
+        # For z >= 0: sigmoid(z) = 1 / (1 + exp(-z))
+        result[pos_mask] = 1 / (1 + np.exp(-z[pos_mask]))
+        # For z < 0: sigmoid(z) = exp(z) / (1 + exp(z))
+        exp_z = np.exp(z[neg_mask])
+        result[neg_mask] = exp_z / (1 + exp_z)
         if ctx is not None:
             ctx.save_for_backward(result)
         return result
@@ -592,7 +618,8 @@ class BinaryCrossEntropyFunction(Function):
         pred, target = np.asanyarray(pred), np.asanyarray(target)
 
         # Clip predictions for numerical stability
-        eps = 1e-12
+        # Use 1e-7 as eps since float32 has ~7 digits of precision
+        eps = 1e-7
         pred_clipped = np.clip(pred, eps, 1 - eps)
 
         # BCE: -mean(target * log(pred) + (1 - target) * log(1 - pred))
