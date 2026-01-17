@@ -14,7 +14,7 @@ import numpy as np
 from .context import Context
 
 if TYPE_CHECKING:
-    from ..tensor import Tensor
+    from tinytorch.tensor import Tensor
 
 
 class Function:

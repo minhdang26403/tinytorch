@@ -5,14 +5,15 @@ These are thin wrappers around the autograd Function classes,
 providing a Module interface for use in Sequential and other containers.
 """
 
-from ..autograd import (
+from tinytorch.autograd import (
     GELUFunction,
     ReLUFunction,
     SigmoidFunction,
     SoftmaxFunction,
     TanhFunction,
 )
-from ..tensor import Tensor
+from tinytorch.tensor import Tensor
+
 from .module import Module
 
 

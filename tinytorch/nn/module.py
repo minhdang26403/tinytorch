@@ -1,6 +1,6 @@
 import numpy as np
 
-from ..tensor import Tensor
+from tinytorch.tensor import Tensor
 
 # Constants for weight initialization
 XAVIER_SCALE_FACTOR = 1.0  # Xavier/Glorot initialization uses sqrt(1/fan_in)

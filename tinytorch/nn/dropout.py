@@ -1,6 +1,7 @@
 import numpy as np
 
-from ..tensor import Tensor
+from tinytorch.tensor import Tensor
+
 from .module import Module
 
 # Constants for dropout probabilities

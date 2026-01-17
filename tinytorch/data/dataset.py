@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from ..tensor import Tensor
+from tinytorch.tensor import Tensor
 
 
 class Dataset(ABC):

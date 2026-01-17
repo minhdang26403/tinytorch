@@ -2,7 +2,8 @@ from typing import Iterator
 
 import numpy as np
 
-from ..tensor import Tensor
+from tinytorch.tensor import Tensor
+
 from .dataset import Dataset
 
 

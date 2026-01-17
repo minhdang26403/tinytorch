@@ -7,12 +7,13 @@ providing a Module interface consistent with PyTorch's loss functions.
 
 import numpy as np
 
-from ..autograd import (
+from tinytorch.autograd import (
     BinaryCrossEntropyFunction,
     CrossEntropyFunction,
     MSEFunction,
 )
-from ..tensor import Tensor
+from tinytorch.tensor import Tensor
+
 from .module import Module
 
 

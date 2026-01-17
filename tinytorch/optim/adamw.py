@@ -1,6 +1,7 @@
 import numpy as np
 
-from ..tensor import Tensor
+from tinytorch.tensor import Tensor
+
 from .optimizer import Optimizer
 
 
@@ -43,7 +44,7 @@ class AdamW(Optimizer):
         Perform AdamW update step with decoupled weight decay.
 
         KEY DIFFERENCE from Adam:
-        - Weight decay: θ_t = θ_t - lr * weight_decay * θ_t (applied after gradient update)
+        - Weight decay: θ_t = θ_t - lr * weight_decay * θ_t (applied after grad update)
         - NOT: grad = grad + weight_decay * param (Adam's incorrect approach)
         """
         self.step_count += 1

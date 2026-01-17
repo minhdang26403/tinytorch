@@ -5,7 +5,7 @@ Utility functions for autograd operations.
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from ..tensor import Tensor
+    from tinytorch.tensor import Tensor
 
 
 def unbroadcast(grad: "Tensor", target_shape: tuple[int, ...]) -> "Tensor":
