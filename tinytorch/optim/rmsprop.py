@@ -40,7 +40,7 @@ class RMSProp(Optimizer):
             >>> # Training loop
             >>> optimizer.step()
         """
-        super().__init__(params)
+        super().__init__(params, lr)
         self.lr = lr
         self.alpha = alpha
         self.eps = eps

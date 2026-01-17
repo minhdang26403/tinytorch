@@ -6,6 +6,11 @@ DEFAULT_MIN_LR = 0.01  # Default minimum learning rate for cosine schedule
 DEFAULT_TOTAL_EPOCHS = 100  # Default total epochs for learning rate schedule
 
 
+class LRScheduler:
+    def get_lr(self, epoch: int) -> float:
+        raise NotImplementedError
+
+
 class CosineSchedule:
     """
     Cosine annealing learning rate schedule.

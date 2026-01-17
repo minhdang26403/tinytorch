@@ -24,7 +24,7 @@ class SGD(Optimizer):
         """
         Initialize SGD optimizer.
         """
-        super().__init__(params)
+        super().__init__(params, lr)
         self.lr = lr
         self.momentum = momentum
         self.weight_decay = weight_decay

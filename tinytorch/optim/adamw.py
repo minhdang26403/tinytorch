@@ -29,7 +29,7 @@ class AdamW(Optimizer):
         - Weight decay is applied directly to parameters, not added to gradients
         - This provides better regularization behavior
         """
-        super().__init__(params)
+        super().__init__(params, lr)
 
         self.lr = lr
         self.beta1, self.beta2 = betas

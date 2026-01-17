@@ -2,12 +2,13 @@ from tinytorch.tensor import Tensor
 
 
 class Optimizer:
-    def __init__(self, params: list[Tensor]):
+    def __init__(self, params: list[Tensor], lr: float = 0.0):
         """
         Initialize optimizer with parameters to optimize.
         """
         # Store parameters - gradient tracking is handled by autograd module
         self.params = params
+        self.lr = lr
         self.step_count = 0  # For algorithms that need step counting
 
     def zero_grad(self):

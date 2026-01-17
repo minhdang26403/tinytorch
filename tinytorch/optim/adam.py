@@ -31,9 +31,8 @@ class Adam(Optimizer):
         - eps: Small constant for numerical stability (default: 1e-8)
         - weight_decay: L2 penalty coefficient (default: 0.0)
         """
-        super().__init__(params)
+        super().__init__(params, lr)
 
-        self.lr = lr
         self.beta1, self.beta2 = betas
         self.eps = eps
         self.weight_decay = weight_decay
