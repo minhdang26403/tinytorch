@@ -4,8 +4,10 @@ Neural network modules, activations, and losses for TinyTorch.
 
 from .activation import GELU, ReLU, Sigmoid, Softmax, Tanh
 from .dropout import Dropout
+from .linear import Linear
 from .loss import BinaryCrossEntropyLoss, CrossEntropyLoss, MSELoss, log_softmax
-from .module import Linear, Module, Sequential
+from .module import Module
+from .sequential import Sequential
 
 __all__ = [
     "BinaryCrossEntropyLoss",

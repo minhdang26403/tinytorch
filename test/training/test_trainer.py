@@ -1,7 +1,6 @@
 import numpy as np
 
-from tinytorch.nn.loss import MSELoss
-from tinytorch.nn.module import Linear
+from tinytorch.nn import Linear, MSELoss
 from tinytorch.optim import SGD
 from tinytorch.optim.lr_scheduler import CosineSchedule
 from tinytorch.tensor import Tensor
