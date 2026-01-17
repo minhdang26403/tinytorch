@@ -8,9 +8,11 @@ from .dropout import Dropout
 from .linear import Linear
 from .loss import BinaryCrossEntropyLoss, CrossEntropyLoss, MSELoss, log_softmax
 from .module import Module
+from .pooling import AvgPool2d, MaxPool2d
 from .sequential import Sequential
 
 __all__ = [
+    "AvgPool2d",
     "BinaryCrossEntropyLoss",
     "Conv2d",
     "CrossEntropyLoss",
@@ -18,6 +20,7 @@ __all__ = [
     "GELU",
     "Linear",
     "MSELoss",
+    "MaxPool2d",
     "Module",
     "ReLU",
     "Sequential",
