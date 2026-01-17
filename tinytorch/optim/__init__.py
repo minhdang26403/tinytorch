@@ -1,7 +1,9 @@
 """Optimization algorithms for TinyTorch."""
 
+from .adam import Adam
+from .optimizer import Optimizer
 from .sgd import SGD
 
-__all__ = ["SGD"]
+__all__ = ["Adam", "Optimizer", "SGD"]
 
 assert __all__ == sorted(__all__)
