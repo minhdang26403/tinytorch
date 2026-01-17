@@ -94,7 +94,7 @@ class Softmax(Module):
     def forward(self, x: Tensor, dim: int | None = None) -> Tensor:
         # Allow overriding dim at call time
         actual_dim = dim if dim is not None else self.dim
-        return SoftmaxFunction.apply(x, actual_dim)
+        return SoftmaxFunction.apply(x, axis=actual_dim)
 
     def __repr__(self) -> str:
         return f"Softmax(dim={self.dim})"

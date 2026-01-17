@@ -174,7 +174,7 @@ class Tensor:
         else:
             shape = tuple(shape)
 
-        return ReshapeFunction.apply(self, shape)
+        return ReshapeFunction.apply(self, shape=shape)
 
     def transpose(self, *args, axes=None):
         """
@@ -252,7 +252,7 @@ class Tensor:
                     if next_node not in grads:
                         grads[next_node] = grad_input
                     else:
-                        grads[next_node] = grads[next_node] + grad_input
+                        grads[next_node] += grad_input
 
     @staticmethod
     def _find_topological_order(node: Function) -> list[Function]:

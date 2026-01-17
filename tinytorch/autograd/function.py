@@ -30,19 +30,21 @@ class Function:
         self.next_functions = []
 
     @staticmethod
-    def forward(ctx, *args):
+    def forward(ctx, *args: np.ndarray, **kwargs) -> np.ndarray:
         raise NotImplementedError
 
     @staticmethod
-    def backward(ctx, grad_output):
+    def backward(ctx, grad_output: np.ndarray) -> tuple[np.ndarray, ...]:
         raise NotImplementedError
 
     @classmethod
-    def apply(cls, *args, **kwargs):
+    def apply(cls, *args, **kwargs) -> Tensor:
         from ..tensor import Tensor
 
         # The forward pass code will work directly on the underlying data, not tensor
-        raw_inputs = tuple(arg.data if isinstance(arg, Tensor) else arg for arg in args)
+        raw_inputs = tuple(
+            arg.data if isinstance(arg, Tensor) else np.asanyarray(arg) for arg in args
+        )
         requires_grad = any(
             isinstance(arg, Tensor) and arg.requires_grad for arg in args
         )
@@ -103,9 +105,8 @@ def _unbroadcast(grad: np.ndarray, target_shape: tuple[int, ...]) -> np.ndarray:
 
 class AddFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a, b) = args
-        a, b = np.asanyarray(a), np.asanyarray(b)
         if ctx is not None:
             ctx.save_for_backward(a.shape, b.shape)
         return a + b
@@ -118,9 +119,8 @@ class AddFunction(Function):
 
 class SubFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a, b) = args
-        a, b = np.asanyarray(a), np.asanyarray(b)
         if ctx is not None:
             ctx.save_for_backward(a.shape, b.shape)
         return a - b
@@ -133,9 +133,8 @@ class SubFunction(Function):
 
 class MulFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a, b) = args
-        a, b = np.asanyarray(a), np.asanyarray(b)
         if ctx is not None:
             ctx.save_for_backward(a, b)
         return a * b
@@ -152,9 +151,8 @@ class MulFunction(Function):
 
 class DivFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a, b) = args
-        a, b = np.asanyarray(a), np.asanyarray(b)
         if ctx is not None:
             ctx.save_for_backward(a, b)
         return a / b
@@ -171,9 +169,8 @@ class DivFunction(Function):
 
 class NegFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
         if ctx is not None:
             ctx.save_for_backward(a.shape)
         return -a
@@ -186,9 +183,8 @@ class NegFunction(Function):
 
 class PowFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a, b) = args
-        a, b = np.asanyarray(a), np.asanyarray(b)
         if ctx is not None:
             ctx.save_for_backward(a, b)
         return a**b
@@ -203,7 +199,7 @@ class PowFunction(Function):
 
 class ExpFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
         result = np.exp(a)
         if ctx is not None:
@@ -219,9 +215,8 @@ class ExpFunction(Function):
 
 class MatmulFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a, b) = args
-        a, b = np.asanyarray(a), np.asanyarray(b)
         if ctx is not None:
             ctx.save_for_backward(a, b)
         return a @ b
@@ -245,9 +240,9 @@ class MatmulFunction(Function):
 
 class ReshapeFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
-        (a, shape) = args
-        a = np.asanyarray(a)
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
+        (a,) = args
+        shape = kwargs["shape"]
         if ctx is not None:
             # Save the ORIGINAL shape for backward
             ctx.save_for_backward(a.shape)
@@ -263,9 +258,10 @@ class ReshapeFunction(Function):
 
 class TransposeFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args, axes=None, swap_mode=False) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
+        swap_mode = kwargs["swap_mode"]
+        axes = kwargs["axes"]
 
         if swap_mode and axes is not None and len(axes) == 2:
             # Swap two axes using swapaxes
@@ -299,9 +295,10 @@ class TransposeFunction(Function):
 
 class SumFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args, axis=None, keepdims=False) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
+        axis = kwargs["axis"]
+        keepdims = kwargs["keepdims"]
         if ctx is not None:
             ctx.save_for_backward(a.shape, axis, keepdims)
         return a.sum(axis=axis, keepdims=keepdims)
@@ -334,9 +331,10 @@ class SumFunction(Function):
 
 class MeanFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args, axis=None, keepdims=False) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
+        axis = kwargs["axis"]
+        keepdims = kwargs["keepdims"]
 
         # 1. Perform the mean
         result = a.mean(axis=axis, keepdims=keepdims)
@@ -373,9 +371,10 @@ class MeanFunction(Function):
 
 class MaxFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args, axis=None, keepdims=False) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
+        axis = kwargs["axis"]
+        keepdims = kwargs["keepdims"]
 
         # 1. Compute the maximum
         result = a.max(axis=axis, keepdims=keepdims)
@@ -431,9 +430,8 @@ class MaxFunction(Function):
 
 class ReLUFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
         if ctx is not None:
             ctx.save_for_backward(a)
         return np.maximum(0, a)
@@ -448,9 +446,8 @@ class ReLUFunction(Function):
 
 class SigmoidFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
-        (a,) = args
-        z = np.asanyarray(a)
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
+        (z,) = args
         # Numerically stable sigmoid using mask-based computation
         # This avoids computing exp(z) for large positive z (which overflows)
         result = np.zeros_like(z)
@@ -475,9 +472,8 @@ class SigmoidFunction(Function):
 
 class TanhFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
         result = np.tanh(a)
         if ctx is not None:
             ctx.save_for_backward(result)
@@ -493,9 +489,8 @@ class TanhFunction(Function):
 
 class GELUFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (a,) = args
-        a = np.asanyarray(a)
         # Tanh approximation: 0.5 * x * (1 + tanh(sqrt(2/pi) * (x + 0.044715 * x^3)))
         sqrt_2_over_pi = np.sqrt(2 / np.pi)
         inner = sqrt_2_over_pi * (a + 0.044715 * a**3)
@@ -519,9 +514,9 @@ class GELUFunction(Function):
 
 class SoftmaxFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
-        (a, axis) = args
-        a = np.asanyarray(a)
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
+        (a,) = args
+        axis = kwargs["axis"]
         # Numerically stable softmax: subtract max before exp
         a_max = a.max(axis=axis, keepdims=True)
         exp_a = np.exp(a - a_max)
@@ -546,9 +541,8 @@ class SoftmaxFunction(Function):
 
 class MSEFunction(Function):
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (pred, target) = args
-        pred, target = np.asanyarray(pred), np.asanyarray(target)
         diff = pred - target
         result = np.mean(diff**2)
         if ctx is not None:
@@ -573,10 +567,9 @@ class CrossEntropyFunction(Function):
     """
 
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (logits, targets) = args
-        logits = np.asanyarray(logits)
-        targets = np.asanyarray(targets).astype(np.int64)
+        targets = targets.astype(np.int64)
 
         # Compute softmax (numerically stable)
         logits_max = logits.max(axis=-1, keepdims=True)
@@ -614,9 +607,8 @@ class BinaryCrossEntropyFunction(Function):
     """
 
     @staticmethod
-    def forward(ctx: Context, *args) -> np.ndarray:
+    def forward(ctx: Context, *args: np.ndarray, **kwargs) -> np.ndarray:
         (pred, target) = args
-        pred, target = np.asanyarray(pred), np.asanyarray(target)
 
         # Clip predictions for numerical stability
         # Use 1e-7 as eps since float32 has ~7 digits of precision
