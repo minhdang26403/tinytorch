@@ -17,6 +17,7 @@ from .loss import BinaryCrossEntropyLoss, CrossEntropyLoss, MSELoss, log_softmax
 from .module import Module
 from .pooling import AvgPool2d, MaxPool2d
 from .sequential import Sequential
+from .transformer import GPT, MLP, LayerNorm, TransformerBlock
 
 __all__ = [
     "AvgPool2d",
@@ -28,7 +29,10 @@ __all__ = [
     "Embedding",
     "EmbeddingLayer",
     "GELU",
+    "GPT",
+    "LayerNorm",
     "Linear",
+    "MLP",
     "MSELoss",
     "MaxPool2d",
     "Module",
@@ -38,6 +42,7 @@ __all__ = [
     "Sigmoid",
     "Softmax",
     "Tanh",
+    "TransformerBlock",
     "create_sinusoidal_embeddings",
     "log_softmax",
 ]
