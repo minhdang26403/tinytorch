@@ -3,6 +3,7 @@ Neural network modules, activations, and losses for TinyTorch.
 """
 
 from .activation import GELU, ReLU, Sigmoid, Softmax, Tanh
+from .batchnorm import BatchNorm2d
 from .conv import Conv2d
 from .dropout import Dropout
 from .linear import Linear
@@ -13,6 +14,7 @@ from .sequential import Sequential
 
 __all__ = [
     "AvgPool2d",
+    "BatchNorm2d",
     "BinaryCrossEntropyLoss",
     "Conv2d",
     "CrossEntropyLoss",
