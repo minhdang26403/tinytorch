@@ -2,7 +2,6 @@ import numpy as np
 import pytest
 
 from tinytorch.nn import Conv2d
-from tinytorch.nn.conv import GroupedConv2d
 from tinytorch.tensor import Tensor
 
 
@@ -82,9 +81,7 @@ def test_unit_grouped_conv2d():
 
     # Test 1: Basic grouped convolution (groups=2)
     print("  Testing basic grouped convolution (groups=2)...")
-    conv1 = GroupedConv2d(
-        in_channels=4, out_channels=8, kernel_size=3, groups=2, padding=1
-    )
+    conv1 = Conv2d(in_channels=4, out_channels=8, kernel_size=3, groups=2, padding=1)
     x1 = Tensor(np.random.randn(2, 4, 16, 16))
     out1 = conv1(x1)
 
@@ -94,9 +91,7 @@ def test_unit_grouped_conv2d():
 
     # Test 2: Depthwise convolution (groups=in_channels)
     print("  Testing depthwise convolution (groups=in_channels)...")
-    conv2 = GroupedConv2d(
-        in_channels=8, out_channels=8, kernel_size=3, groups=8, padding=1
-    )
+    conv2 = Conv2d(in_channels=8, out_channels=8, kernel_size=3, groups=8, padding=1)
     x2 = Tensor(np.random.randn(1, 8, 32, 32))
     out2 = conv2(x2)
 
@@ -110,9 +105,7 @@ def test_unit_grouped_conv2d():
 
     # Test 3: Grouped convolution with stride
     print("  Testing grouped convolution with stride...")
-    conv3 = GroupedConv2d(
-        in_channels=6, out_channels=12, kernel_size=3, groups=3, stride=2
-    )
+    conv3 = Conv2d(in_channels=6, out_channels=12, kernel_size=3, groups=3, stride=2)
     x3 = Tensor(np.random.randn(1, 6, 16, 16))
     out3 = conv3(x3)
 
@@ -124,9 +117,7 @@ def test_unit_grouped_conv2d():
 
     # Test 4: Parameter counting for grouped conv
     print("  Testing parameter counting...")
-    conv4 = GroupedConv2d(
-        in_channels=64, out_channels=128, kernel_size=3, groups=4, bias=True
-    )
+    conv4 = Conv2d(in_channels=64, out_channels=128, kernel_size=3, groups=4, bias=True)
     params = conv4.parameters()
 
     # Weight: (128, 64//4, 3, 3) = (128, 16, 3, 3) = 73,728 parameters
@@ -146,9 +137,7 @@ def test_unit_grouped_conv2d():
 
     # Test 5: No bias configuration
     print("  Testing no bias configuration...")
-    conv5 = GroupedConv2d(
-        in_channels=16, out_channels=32, kernel_size=3, groups=4, bias=False
-    )
+    conv5 = Conv2d(in_channels=16, out_channels=32, kernel_size=3, groups=4, bias=False)
     params5 = conv5.parameters()
     assert len(params5) == 1, (
         f"Expected 1 parameter tensor (no bias), got {len(params5)}"
@@ -163,7 +152,7 @@ def test_unit_grouped_conv2d():
     regular_conv = Conv2d(in_channels=4, out_channels=4, kernel_size=3, padding=1)
 
     # Grouped conv (groups=4): each output channel sees only 1 input channel
-    grouped_conv = GroupedConv2d(
+    grouped_conv = Conv2d(
         in_channels=4, out_channels=4, kernel_size=3, groups=4, padding=1
     )
 
@@ -179,10 +168,10 @@ def test_unit_grouped_conv2d():
     print("  Testing invalid groups raises error...")
     with pytest.raises(AssertionError):
         # in_channels=5 is not divisible by groups=2
-        GroupedConv2d(in_channels=5, out_channels=4, kernel_size=3, groups=2)
+        Conv2d(in_channels=5, out_channels=4, kernel_size=3, groups=2)
 
     with pytest.raises(AssertionError):
         # out_channels=5 is not divisible by groups=2
-        GroupedConv2d(in_channels=4, out_channels=5, kernel_size=3, groups=2)
+        Conv2d(in_channels=4, out_channels=5, kernel_size=3, groups=2)
 
     print("✅ GroupedConv2d works correctly!")
